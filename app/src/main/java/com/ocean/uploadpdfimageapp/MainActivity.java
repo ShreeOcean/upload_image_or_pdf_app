@@ -64,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
                     intent.setType("application/pdf");
                     /** Optionally, specify a URI for the file that should appear in the system file picker when it loads. */
                     intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
-                    startActivityForResult(intent, PICK_PDF_FILE);
+                    startActivityIfNeeded(intent, PICK_PDF_FILE);
                 }else if (items[which].equals("Choose Image")){
                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_APP_GALLERY);
                     intent.setType("image/*");
                     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-                    startActivityForResult(intent, PICK_IMAGE_FILE);
+                    startActivityIfNeeded(intent, PICK_IMAGE_FILE);
                 }
             }
         });
