@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.util.Base64;
 import android.view.View;
 import com.ocean.uploadpdfimageapp.databinding.ActivityMainBinding;
@@ -23,9 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     private static final int REQUEST_GALLERY_CODE = 201;
-    int SELECT_IMAGE_FILE = 1;
-    int SELECT_PDF_FILE = 3;
-    private Uri uri;
+    private static final int PICK_IMAGE_FILE = 1;
+    private static final int PICK_PDF_FILE = 2;
+    Uri pickerInitialUri;
     String uploaded_image_name, imageFilePath;
     Bitmap bitmap;
 
@@ -58,10 +59,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (items[which].equals("Choose PDF")){
-
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("application/pdf");
+                    /** Optionally, specify a URI for the file that should appear in the system file picker when it loads. */
+                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+                    startActivityForResult(intent, PICK_PDF_FILE);
+                }else if (items[which].equals("Choose Image")){
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_APP_GALLERY);
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+                    startActivityForResult(intent, PICK_IMAGE_FILE);
                 }
             }
         });
+        builder.show();
     }
 
     @Override
