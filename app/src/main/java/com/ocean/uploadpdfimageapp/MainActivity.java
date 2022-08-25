@@ -34,15 +34,13 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     private static final int REQUEST_GALLERY_CODE = 201;
-    private static final int PICK_IMAGE_FILE = 1;
-    private static final int PICK_PDF_FILE = 2;
     Uri pickerInitialUri;
-    String uploaded_image_name, imageFilePath, pdfFilePath;
+    String imageFilePath, pdfFilePath;
     Bitmap bitmap;
-    int SELECT_FILE_IMAGE = 101;
-    int SELECT_PDF_FILE = 103;
-    int SELECT_PDF_FOR_EXPENSES_INFO = 105;
-    int SELECT_IMAGE_FOR_EXPENSES_INFO= 107;
+    int SELECT_IMAGE = 101;
+    int SELECT_PDF = 103;
+    int SELECT_PDF_FOR_ARRAY = 105;
+    int SELECT_IMAGE_FOR_ARRAY= 107;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,24 +66,24 @@ public class MainActivity extends AppCompatActivity {
         final CharSequence[] items = {"Choose PDF", "Choose Image", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Add PDF/IMAGE!");
-
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (items[which].equals("Choose PDF")){
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("application/pdf");
-                    /** Optionally, specify a URI for the file that should appear in the system file picker when it loads. */
-                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+
+                    Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(intent, PICK_PDF_FILE);
+                    intent.setType("application/pdf");
+                    startActivityForResult(intent, SELECT_PDF);
+
                 }else if (items[which].equals("Choose Image")){
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_APP_GALLERY);
+
+                    Intent intent = new Intent();
                     intent.setType("image/*");
                     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-                    startActivityForResult(intent, PICK_IMAGE_FILE);
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_IMAGE);
+
                 }else if (items[which].equals("Cancel")){
                     dialog.dismiss();
                 }
@@ -98,31 +96,41 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_FILE_IMAGE) {
-//            onSelectFromGalleryResult(data);
+        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE) {
+
+            //TODO code to get selected image for single time from storage
+            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
+
+            pickerInitialUri = data.getData();
+            convertToString(pickerInitialUri);
+            binding.tvImageName1.setText(pickerInitialUri.getLastPathSegment());
+
+        }
+        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF) {
+
+            //TODO code to get selected pdf for single time from storage
             Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
 
         }
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FILE) {
-//            selectPdfFromGallery(data);
 
-            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
-
-        }
-        //TODO: update field condition code for attachment in expenses-info
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE_FOR_EXPENSES_INFO){
-            //TODO code to get selected image from storage
+        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE_FOR_ARRAY){
+            //TODO code to get selected image for multiple selection or list of selection  from storage
             onSelectImageForExpensesInfo(data);
 
             Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
 
         }
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FOR_EXPENSES_INFO){
-            //TODO code to get selected pdf from storage
+        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FOR_ARRAY){
+            //TODO code to get selected pdf for multiple selection or list of selection  from storage
             onSelectedPdfForExpensesInfo(data);
 
             Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
         }
+    }
+
+    private void convertToString(Uri pickerInitialUri) {
+
+
     }
 
     private void onSelectedPdfForExpensesInfo(@NonNull Intent data) {
