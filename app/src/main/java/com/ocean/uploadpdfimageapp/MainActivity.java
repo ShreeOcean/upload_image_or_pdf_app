@@ -37,12 +37,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_FILE = 1;
     private static final int PICK_PDF_FILE = 2;
     Uri pickerInitialUri;
-    String uploaded_image_name, imageFilePath;
+    String uploaded_image_name, imageFilePath, pdfFilePath;
     Bitmap bitmap;
-    int SELECT_FILE = 1;
-    int SELECT_PDF_FILE = 3;
-    int SELECT_PDF_FOR_EXPENSES_INFO = 5;
-    int SELECT_IMAGE_FOR_EXPENSES_INFO= 7;
+    int SELECT_FILE_IMAGE = 101;
+    int SELECT_PDF_FILE = 103;
+    int SELECT_PDF_FOR_EXPENSES_INFO = 105;
+    int SELECT_IMAGE_FOR_EXPENSES_INFO= 107;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         binding =  ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.btnChooseFileReportExpense.setVisibility(View.VISIBLE);
-        binding.btnChooseFileReportExpense.setOnClickListener(v -> {
+        binding.btnChooseSingleFile.setVisibility(View.VISIBLE);
+        binding.btnChooseSingleFile.setOnClickListener(v -> {
             if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{
@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
                     intent.setType("image/*");
                     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
                     startActivityForResult(intent, PICK_IMAGE_FILE);
+                }else if (items[which].equals("Cancel")){
+                    dialog.dismiss();
                 }
             }
         });
@@ -95,180 +97,53 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_FILE) {
-//            onSelectFromGalleryResult(data);
 
-        } else if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FILE) {
+        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_FILE_IMAGE) {
+//            onSelectFromGalleryResult(data);
+            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
+
+        }
+        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FILE) {
 //            selectPdfFromGallery(data);
-        } //TODO: update field condition code for attachment in expenses-info
-        else if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE_FOR_EXPENSES_INFO){
+
+            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
+
+        }
+        //TODO: update field condition code for attachment in expenses-info
+        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE_FOR_EXPENSES_INFO){
             //TODO code to get selected image from storage
             onSelectImageForExpensesInfo(data);
-        }else if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FOR_EXPENSES_INFO){
+
+            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
+
+        }
+        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FOR_EXPENSES_INFO){
             //TODO code to get selected pdf from storage
             onSelectedPdfForExpensesInfo(data);
+
+            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
         }
     }
 
     private void onSelectedPdfForExpensesInfo(@NonNull Intent data) {
-        uri = data.getData();
+
+        Log.d("MainActivity", "onSelectedPdfForExpensesInfo: " + data.getData());
+        System.out.println("onSelectedPdfForExpensesInfo: " + data.getData().getPath());
+
+        Uri uri = data.getData();
         String uriString = uri.toString();
-        File myFile = new File(uriString);
-        String paths = myFile.getAbsolutePath();
-        String displayName = null;
+        File file = new File(uriString);
+        pdfFilePath = file.getAbsolutePath();
+        //TODO: code for coverting file to base64
+        binding.tvImageName1.setText(file.getName());
+        Log.d("MainActivity", "onSelectedPdfForExpensesInfo: " + pdfFilePath);
 
-        if (uriString.startsWith("content://")) {
-            Cursor cursor = null;
-            try {
-
-                cursor = getContentResolver().query(uri, null, null, null, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    String fgd = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-
-                    /** as per update on 11aug22 showing chosen pdf or photo to show on textview */
-                    tvImgNameReportExpense.setText(fgd);
-
-                    String pdfoimg = fgd.substring(fgd.length() - 4);
-                    imageFilePath = fgd;
-                    try {
-                        InputStream iStream = getContentResolver().openInputStream(uri);
-                        byte[] inputData = getBytes(iStream);
-                        DataPart dp = new DataPart(imageFilePath, inputData, "application/pdf");
-                        dataPart.add(dp);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-            } finally {
-                cursor.close();
-            }
-        } else if (uriString.startsWith("file://")) {
-            imageFilePath = myFile.getName();
-            try {
-                InputStream iStream = getContentResolver().openInputStream(uri);
-                byte[] inputData = getBytes(iStream);
-                DataPart dp = new DataPart(imageFilePath, inputData, "application/pdf");
-                dataPart.add(dp);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            /** as per update on 11aug22 showing choosen pdf or photo to show on textview */
-            tvImgNameReportExpense.setText(imageFilePath);
-
-
-        }
     }
 
     private void onSelectImageForExpensesInfo(@NonNull Intent data) {
-        uri = data.getData();
-        uries.add(uri); //TODO: list of uri
-        String uriString = uri.toString();
-        File myFile = new File(uriString);
-        try {
-            /** checking the build version of device must be greater than equal to android jellybean */
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                if (data.getClipData() != null) {
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    /** evaluate the count before the for loop --- otherwise, the count is evaluated every loop. */
-                    int count = data.getClipData().getItemCount();
-                    for (int i = 0; i < count; i++) { //TODO: why ?
-
-                        Uri selectedImageUri = data.getClipData().getItemAt(i).getUri();
-
-                        BitmapFactory.decodeStream(RepostExpensesActivity.this.getContentResolver().openInputStream(selectedImageUri), null, options);
-
-                        options.inSampleSize = calculateInSampleSize(options, 1000, 1000);
-                        options.inJustDecodeBounds = false;
-
-                        bmp = BitmapFactory.decodeStream(RepostExpensesActivity.this.getContentResolver().openInputStream(selectedImageUri), null, options);
 
 
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                        imageBytes = baos.toByteArray();
-
-
-                        Uri furi = getImageUri(getApplicationContext(), bmp);
-                        //File finalFile = new File(getRealPathFromUri(furi));
-                        File finalFile = FileUtils.getFile(getApplicationContext(), furi);
-                        imageFilePath = finalFile.toString();
-                        Log.d("imageFilePathForEI1", imageFilePath); //ExpensesInfo
-                        /** as per update on 11aug22 showing choosen pdf or photo to show on textview */
-                        tvImgNameReportExpense.setText(imageFilePath);
-
-                        try {
-                            InputStream iStream = getContentResolver().openInputStream(uri);//TODO: uri is used here
-                            byte[] inputData = getBytes(iStream);
-                            DataPart dp = new DataPart(imageFilePath, inputData, "image/jpeg");
-                            dataPart.add(dp);
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } else if (data.getData() != null) {
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    //evaluate the count before the for loop --- otherwise, the count is evaluated every loop.
-
-                    Uri selectedImageUri = data.getData();
-
-                    BitmapFactory.decodeStream(RepostExpensesActivity.this.getContentResolver().openInputStream(selectedImageUri), null, options);
-
-                    options.inSampleSize = calculateInSampleSize(options, 1000, 1000);
-                    options.inJustDecodeBounds = false;
-
-                    bmp = BitmapFactory.decodeStream(RepostExpensesActivity.this.getContentResolver().openInputStream(selectedImageUri), null, options);
-
-
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                    imageBytes = baos.toByteArray();
-
-
-                    Uri furi = getImageUri(getApplicationContext(), bmp);
-                    //File finalFile = new File(getRealPathFromUri(furi));
-                    File finalFile = FileUtils.getFile(getApplicationContext(), furi);
-
-                    imageFilePath = finalFile.toString();
-                    /** as per update on 11aug22 showing choosen pdf or photo to show on textview */
-                    tvImgNameReportExpense.setText(imageFilePath);
-                    Log.d("imageFilePathForEI2", imageFilePath);
-                    try {
-                        InputStream iStream = getContentResolver().openInputStream(uri);
-                        byte[] inputData = getBytes(iStream);
-                        DataPart dp = new DataPart(imageFilePath, inputData, "image/jpeg");
-                        dataPart.add(dp);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            Log.v("tostring", e.toString());
-        }
     }
 
-    /** String method to covert bitmap to base64 */
-    public static String convertBitmapToBase64(@NonNull Bitmap bitmap){
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream .toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
 
-    /** method to covert base64 to bitmap */
-    public static Bitmap convertBase64ToBitmap(String base64){
-        byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        return bitmap;
-    }
 }

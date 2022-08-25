@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">UploadPDFImageApp</string>
+    <string name="showing_single_selected_file">Showing single selected file</string>
+    <string name="add_attachment_1">Add Attachment 1 :</string>
 </resources>

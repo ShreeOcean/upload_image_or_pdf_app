@@ -1,79 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="20dp"
-        android:background="#F1FDFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/txt_add_attachment_report_expense"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Attachment :"
-            android:textColor="@color/black"
-            android:textSize="14dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/ll_add_attachment"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#EAFFEB">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textAllCaps="true"
+                android:layout_margin="10dp"
+                android:text="@string/showing_single_selected_file"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="#FFFFFF"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/ll_add_attachment"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnChooseSingleFile"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1.8"
+                        android:gravity="start|center"
+                        android:padding="10dp"
+                        android:textAlignment="center"
+                        android:text="Chose file"
+                        android:textColor="@color/black"
+                        android:textSize="8sp"
+                        android:textStyle="bold"
+                        app:icon="@drawable/ic_add_24" />
+
+
+                    <TextView
+                        android:id="@+id/tv_image_name_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:layout_margin="2dp"
+                        android:layout_weight="1"
+                        android:gravity="start|center"
+                        android:text="No File Chosen"
+                        android:textColor="@color/black"
+                        android:textSize="12dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:background="@drawable/icon_background_image"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#F3ECFF">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textAllCaps="true"
+                android:layout_margin="10dp"
+                android:text="Showing selected file in a array list format"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <Button
-                android:id="@+id/btnChooseFileReportExpense"
+                android:id="@+id/btnAddListOfUpload"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
                 android:layout_weight="1.8"
                 android:gravity="start|center"
-                android:padding="2dp"
-                android:text="Choose file"
+                android:padding="10dp"
+                android:text="Select PDF or Image"
+                android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="8sp"
                 android:textStyle="bold"
-                android:visibility="gone"
+
                 app:icon="@drawable/ic_add_24" />
 
-
-            <TextView
-                android:id="@+id/tv_image_name_report_expense"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_multiple_upload_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center"
-                android:layout_margin="2dp"
-                android:layout_weight="1"
-                android:gravity="start|center"
-                android:text="No File Choosen"
-                android:textColor="@color/black"
-                android:textSize="12dp" />
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:padding="5dp" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/image_view"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_margin="20dp"
-        android:background="@drawable/icon_background_image"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
