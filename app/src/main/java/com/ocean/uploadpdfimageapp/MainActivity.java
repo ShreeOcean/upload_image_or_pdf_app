@@ -11,21 +11,17 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
-import android.provider.OpenableColumns;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+
+import com.bumptech.glide.Glide;
 import com.ocean.uploadpdfimageapp.databinding.ActivityMainBinding;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -42,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     int SELECT_PDF = 103;
     int SELECT_PDF_FOR_ARRAY = 105;
     int SELECT_IMAGE_FOR_ARRAY= 107;
+    private Object Document;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +100,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
                 pickerInitialUri = data.getData();
                 convertToString(pickerInitialUri);
-                binding.tvImageName1.setText(pickerInitialUri.getPath());
+//                uriString = pickerInitialUri.toString();
+//                File file =new File(uriString);
+//                binding.tvImageName1.setText(file.getAbsolutePath());
+//                if (uriString!=null){
+//                    binding.imageView.setVisibility(View.VISIBLE);
+//                    Glide.with(this).load(uriString).into(binding.imageView);
+//                }
             }
         }
         if (resultCode == Activity.RESULT_OK) {
@@ -112,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
                 pickerInitialUri = data.getData();
                 convertToString(pickerInitialUri);
-                binding.tvImageName1.setText(pickerInitialUri.getLastPathSegment());
             }
 
         }
@@ -122,8 +124,6 @@ public class MainActivity extends AppCompatActivity {
 //            onSelectImageForExpensesInfo(data);
                 Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
                 pickerInitialUri = data.getData();
-                convertToString(pickerInitialUri);
-                binding.tvImageName1.setText(pickerInitialUri.getLastPathSegment());
             }
         }
         if (resultCode == Activity.RESULT_OK){
@@ -132,8 +132,6 @@ public class MainActivity extends AppCompatActivity {
 //            onSelectedPdfForExpensesInfo(data);
                 Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
                 pickerInitialUri = data.getData();
-                convertToString(pickerInitialUri);
-                binding.tvImageName1.setText(pickerInitialUri.getLastPathSegment());
             }
         }
     }
@@ -141,12 +139,20 @@ public class MainActivity extends AppCompatActivity {
     private void convertToString(Uri pickerInitialUri) {
 
         uriString = pickerInitialUri.toString();
+        File file =new File(uriString);
+        binding.tvImageName1.setText(file.getAbsolutePath());
+        if (uriString!=null){
+            binding.imageView.setVisibility(View.VISIBLE);
+            Glide.with(this).load(pickerInitialUri).into(binding.imageView);
+        }
+
         try {
             InputStream inputStream = getContentResolver().openInputStream(pickerInitialUri);
             bytes = getBytes(inputStream);
             Log.d("data", "onActivityResult: bytes size = "+bytes.length);
             Log.d("data", "onActivityResult: Base64string = "+Base64.encodeToString(bytes,Base64.DEFAULT));
-
+            String value = Base64.encodeToString(bytes,Base64.DEFAULT);
+//            Document = Base64.encodeToString(bytes,Base64.DEFAULT);
 
         }catch (Exception e){
             // TODO: handle exception

@@ -7,9 +7,9 @@
     android:background="@drawable/layout_bg_round">
 
     <ImageView
-        android:id="@+id/imageView_pdf_image"
+        android:id="@+id/imageView_image_pdf"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,18 +22,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView_pdf_image">
+        app:layout_constraintTop_toBottomOf="@+id/imageView_image_pdf">
 
         <ImageView
             android:id="@+id/imageView_pdf_image_icon"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_margin="5dp"
+            android:layout_gravity="center"
             android:background="@drawable/icon_pdf" />
 
         <TextView
             android:id="@+id/tv_image_name_array"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="50dp"
             android:layout_margin="5dp"
             android:gravity="center"
