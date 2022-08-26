@@ -35,8 +35,9 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     private static final int REQUEST_GALLERY_CODE = 201;
     Uri pickerInitialUri;
-    String imageFilePath, pdfFilePath;
+    String imageFilePath, pdfFilePath, uriString;
     Bitmap bitmap;
+    byte[] bytes;
     int SELECT_IMAGE = 101;
     int SELECT_PDF = 103;
     int SELECT_PDF_FOR_ARRAY = 105;
@@ -96,41 +97,76 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE) {
-
+        if (resultCode == Activity.RESULT_OK) {
             //TODO code to get selected image for single time from storage
-            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
-
-            pickerInitialUri = data.getData();
-            convertToString(pickerInitialUri);
-            binding.tvImageName1.setText(pickerInitialUri.getLastPathSegment());
-
+            if (requestCode == SELECT_IMAGE){
+                Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
+                pickerInitialUri = data.getData();
+                convertToString(pickerInitialUri);
+                binding.tvImageName1.setText(pickerInitialUri.getPath());
+            }
         }
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF) {
-
+        if (resultCode == Activity.RESULT_OK) {
             //TODO code to get selected pdf for single time from storage
-            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
+            if (requestCode == SELECT_PDF){
+                Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
+                pickerInitialUri = data.getData();
+                convertToString(pickerInitialUri);
+                binding.tvImageName1.setText(pickerInitialUri.getLastPathSegment());
+            }
 
         }
-
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE_FOR_ARRAY){
-            //TODO code to get selected image for multiple selection or list of selection  from storage
-            onSelectImageForExpensesInfo(data);
-
-            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
-
+        if (resultCode == Activity.RESULT_OK){
+            if (requestCode == SELECT_IMAGE_FOR_ARRAY) {
+                //TODO code to get selected image for multiple selection or list of selection  from storage
+//            onSelectImageForExpensesInfo(data);
+                Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
+                pickerInitialUri = data.getData();
+                convertToString(pickerInitialUri);
+                binding.tvImageName1.setText(pickerInitialUri.getLastPathSegment());
+            }
         }
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FOR_ARRAY){
-            //TODO code to get selected pdf for multiple selection or list of selection  from storage
-            onSelectedPdfForExpensesInfo(data);
-
-            Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
+        if (resultCode == Activity.RESULT_OK){
+            if (requestCode == SELECT_PDF_FOR_ARRAY){
+                //TODO code to get selected pdf for multiple selection or list of selection  from storage
+//            onSelectedPdfForExpensesInfo(data);
+                Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
+                pickerInitialUri = data.getData();
+                convertToString(pickerInitialUri);
+                binding.tvImageName1.setText(pickerInitialUri.getLastPathSegment());
+            }
         }
     }
 
     private void convertToString(Uri pickerInitialUri) {
 
+        uriString = pickerInitialUri.toString();
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(pickerInitialUri);
+            bytes = getBytes(inputStream);
+            Log.d("data", "onActivityResult: bytes size = "+bytes.length);
+            Log.d("data", "onActivityResult: Base64string = "+Base64.encodeToString(bytes,Base64.DEFAULT));
 
+
+        }catch (Exception e){
+            // TODO: handle exception
+            e.printStackTrace();
+            Log.d("error", "onActivityResult: " + e.toString());
+        }
+
+    }
+
+    private byte[] getBytes(InputStream inputStream) throws IOException {
+
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 
     private void onSelectedPdfForExpensesInfo(@NonNull Intent data) {
