@@ -8,12 +8,15 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -24,21 +27,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     private static final int REQUEST_GALLERY_CODE = 201;
-    Uri pickerInitialUri;
-    String imageFilePath, pdfFilePath, uriString;
-    Bitmap bitmap;
-    byte[] bytes;
+    Uri uri_single, uri_multi;
+    String imageFilePath_single = null,
+            imageFilePath_multi = null,
+            uriString;
+    Bitmap bitmap_single_file, bitmap_multi_file;
+    byte[] bytes_single_file, bytes_multi_file;
     int SELECT_IMAGE = 101;
     int SELECT_PDF = 103;
     int SELECT_PDF_FOR_ARRAY = 105;
     int SELECT_IMAGE_FOR_ARRAY= 107;
-    private Object Document;
+    boolean status_single_file = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                                         .READ_EXTERNAL_STORAGE},
                         1);
             }else {
+                status_single_file = true;
                 startDialog();
             }
         });
@@ -94,106 +103,37 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == Activity.RESULT_OK) {
-            //TODO code to get selected image for single time from storage
-            if (requestCode == SELECT_IMAGE){
+        if (status_single_file == true) {
+            if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE) {
+                //TODO code to get selected image for single time from storage
                 Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
-                pickerInitialUri = data.getData();
-                convertToString(pickerInitialUri);
-//                uriString = pickerInitialUri.toString();
-//                File file =new File(uriString);
-//                binding.tvImageName1.setText(file.getAbsolutePath());
-//                if (uriString!=null){
-//                    binding.imageView.setVisibility(View.VISIBLE);
-//                    Glide.with(this).load(uriString).into(binding.imageView);
-//                }
-            }
-        }
-        if (resultCode == Activity.RESULT_OK) {
-            //TODO code to get selected pdf for single time from storage
-            if (requestCode == SELECT_PDF){
+            } else if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF) {
+                //TODO code to get selected pdf for single time from storage
                 Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE -->" + data.toString());
-                pickerInitialUri = data.getData();
-                convertToString(pickerInitialUri);
             }
-
-        }
-        if (resultCode == Activity.RESULT_OK){
-            if (requestCode == SELECT_IMAGE_FOR_ARRAY) {
+            status_single_file = false;
+        } else {
+            if (resultCode == Activity.RESULT_OK && requestCode == SELECT_IMAGE_FOR_ARRAY){
                 //TODO code to get selected image for multiple selection or list of selection  from storage
-//            onSelectImageForExpensesInfo(data);
                 Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
-                pickerInitialUri = data.getData();
-            }
-        }
-        if (resultCode == Activity.RESULT_OK){
-            if (requestCode == SELECT_PDF_FOR_ARRAY){
+            } else if (resultCode == Activity.RESULT_OK && requestCode == SELECT_PDF_FOR_ARRAY){
                 //TODO code to get selected pdf for multiple selection or list of selection  from storage
-//            onSelectedPdfForExpensesInfo(data);
                 Log.d("MainActivity", "onActivityResult: SELECT_FILE_IMAGE --> " + data.toString());
-                pickerInitialUri = data.getData();
             }
+            status_single_file = true;
         }
     }
 
-    private void convertToString(Uri pickerInitialUri) {
-
-        uriString = pickerInitialUri.toString();
-        File file =new File(uriString);
-        binding.tvImageName1.setText(file.getAbsolutePath());
-        if (uriString!=null){
-            binding.imageView.setVisibility(View.VISIBLE);
-            Glide.with(this).load(pickerInitialUri).into(binding.imageView);
-        }
-
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(pickerInitialUri);
-            bytes = getBytes(inputStream);
-            Log.d("data", "onActivityResult: bytes size = "+bytes.length);
-            Log.d("data", "onActivityResult: Base64string = "+Base64.encodeToString(bytes,Base64.DEFAULT));
-            String value = Base64.encodeToString(bytes,Base64.DEFAULT);
-//            Document = Base64.encodeToString(bytes,Base64.DEFAULT);
-
-        }catch (Exception e){
-            // TODO: handle exception
-            e.printStackTrace();
-            Log.d("error", "onActivityResult: " + e.toString());
-        }
-
-    }
-
-    private byte[] getBytes(InputStream inputStream) throws IOException {
+    @NonNull
+    private byte[] getBytes(@NonNull InputStream inputStream) throws IOException {
 
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
         int bufferSize = 1024;
         byte[] buffer = new byte[bufferSize];
-
         int len = 0;
         while ((len = inputStream.read(buffer)) != -1) {
             byteBuffer.write(buffer, 0, len);
         }
         return byteBuffer.toByteArray();
     }
-
-    private void onSelectedPdfForExpensesInfo(@NonNull Intent data) {
-
-        Log.d("MainActivity", "onSelectedPdfForExpensesInfo: " + data.getData());
-        System.out.println("onSelectedPdfForExpensesInfo: " + data.getData().getPath());
-
-        Uri uri = data.getData();
-        String uriString = uri.toString();
-        File file = new File(uriString);
-        pdfFilePath = file.getAbsolutePath();
-        //TODO: code for coverting file to base64
-        binding.tvImageName1.setText(file.getName());
-        Log.d("MainActivity", "onSelectedPdfForExpensesInfo: " + pdfFilePath);
-
-    }
-
-    private void onSelectImageForExpensesInfo(@NonNull Intent data) {
-
-
-    }
-
-
 }
