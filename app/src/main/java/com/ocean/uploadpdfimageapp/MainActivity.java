@@ -8,27 +8,19 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-
-import com.bumptech.glide.Glide;
 import com.ocean.uploadpdfimageapp.databinding.ActivityMainBinding;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+
 
 
 public class MainActivity extends AppCompatActivity {
